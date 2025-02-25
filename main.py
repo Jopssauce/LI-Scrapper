@@ -19,7 +19,7 @@ rand_proxy = random.choice(proxies_list)
 # Free proxies is failing because I need SSL Verification
 # Or the page is being populated by JavaScript?
 # BrightData Proxies not working for linkedin. Maybe because of trial account.
-# Okay using only an HTTP proxy works
+# Okay using only an HTTP proxy works but is NOT SAFE
 # https://stackoverflow.com/questions/69220126/getting-ssl-certificate-verify-failed-when-using-proxy-with-python-requests
 resp = requests.get(li_url.format(25), proxies=config['proxies'], headers=config['headers'])
 
