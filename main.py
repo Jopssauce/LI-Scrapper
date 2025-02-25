@@ -1,19 +1,36 @@
 from bs4 import BeautifulSoup
 import requests
 import random
+import json
+import pprint
 
 
-html_doc = """<html><head><title>The Dormouse's story</title></head>
-<body>
-<p class="title"><b>The Dormouse's story</b></p>
+li_url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?_l=en_US&keywords=Software%20Engineer&location=San%20Francisco%20Bay%20Area&geoId=90000084&f_TPR=r86400&start={}"
+target_url='https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=Python%20%28Programming%20Language%29&location=Las%20Vegas%2C%20Nevada%2C%20United%20States&geoId=100293800&currentJobId=3415227738&start={}'
+test_url = "http://lumtest.com/myip.json"
+success = False
 
-<p class="story">Once upon a time there were three little sisters; and their names were
-<a href="http://example.com/elsie" class="sister" id="link1">Elsie</a>,
-<a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
-<a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
-and they lived at the bottom of a well.</p>
 
-<p class="story">...</p>
-"""
-soup = BeautifulSoup(html_doc, 'html.parser')
-print(soup.title.string)
+config = json.load(open("scrapper-config.json"))
+proxies_list = config['proxies_list']
+#for _ in proxies_list: 
+rand_proxy = random.choice(proxies_list)
+
+# Free proxies is failing because I need SSL Verification
+# Or the page is being populated by JavaScript?
+# BrightData Proxies not working for linkedin. Maybe because of trial account.
+# Okay using only an HTTP proxy works
+resp = requests.get(li_url.format(25), proxies=config['proxies'], headers=config['headers'])
+
+if(resp.status_code != 200):
+    print(f"Failed with {resp.status_code} {rand_proxy}")
+else:
+    print(f"Success - {rand_proxy} - {resp.status_code}")
+    success = True
+    #break
+
+if success:
+    soup = BeautifulSoup(resp.raw, 'html.parser')
+    #print(soup.find('h4', class_='base-search-card__title'))
+    #pprint.pprint(resp.text)
+    print(resp.text)
