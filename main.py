@@ -45,14 +45,26 @@ target_resp = requests.get(jobs[0]['href'], proxies=config['proxies'], headers=c
 if(target_resp.status_code == 200):
     target_soup = BeautifulSoup(target_resp.text, 'html.parser')
     target_job = target_soup.find('div', class_ = 'show-more-less-html__markup')
-    print(target_job.contents)
+
+job_data = {
+    'description': target_job.contents,
+    'title': target_soup.find('h1', class_= 'top-card-layout__title').text,
+    'company': target_soup.find('a', class_='topcard__org-name-link').text.strip(),
+    'location': target_soup.find('span', class_='topcard__flavor topcard__flavor--bullet').text.strip(),
+    'pay': p.text if (p := target_soup.find('div', class_='salary compensation__salary')) else '',
+    'level': target_soup.find('span', class_= 'description__job-criteria-text description__job-criteria-text--criteria').text.strip(),
+    'langs': [],
+    'techs': [],
+}
 
 for i in languages:
     res = target_job.text.find(i)
     if (res != -1):
-        print(i)
+        job_data['langs'].append(i)
 
 for i in techs:
     res = target_job.text.find(i)
     if (res != -1):
-        print(i)
+        job_data['techs'].append(i)
+
+print(job_data)
