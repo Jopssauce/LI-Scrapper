@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import random
 import json
-import pprint
+import pandas as pd
 
 
 li_url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?_l=en_US&keywords=Software%20Engineer&location=San%20Francisco%20Bay%20Area&geoId=90000084&f_TPR=r86400&start={}"
@@ -34,37 +34,62 @@ else:
 if success:
     soup = BeautifulSoup(resp.text, 'html.parser')
     jobs = soup.find_all("a", class_ = 'base-card__full-link', href=True)
-    #print(soup.find('h4', class_='base-search-card__title'))
-    #pprint.pprint(resp.text)
-    
-    #for j in jobs:
-    #    print(j['href'])
 
-target_resp = requests.get(jobs[0]['href'], proxies=config['proxies'], headers=config['headers'])
+langs_num = {}
+techs_num = {}
+job_datas = []
 
-if(target_resp.status_code == 200):
-    target_soup = BeautifulSoup(target_resp.text, 'html.parser')
-    target_job = target_soup.find('div', class_ = 'show-more-less-html__markup')
+#Init dictionaries
+for i in config['Languages']:
+    langs_num[i] = 0
 
-job_data = {
-    'description': target_job.contents,
-    'title': target_soup.find('h1', class_= 'top-card-layout__title').text,
-    'company': target_soup.find('a', class_='topcard__org-name-link').text.strip(),
-    'location': target_soup.find('span', class_='topcard__flavor topcard__flavor--bullet').text.strip(),
-    'pay': p.text if (p := target_soup.find('div', class_='salary compensation__salary')) else '',
-    'level': target_soup.find('span', class_= 'description__job-criteria-text description__job-criteria-text--criteria').text.strip(),
-    'langs': [],
-    'techs': [],
-}
+for i in config['Techs']:
+    techs_num[i] = 0
 
-for i in languages:
-    res = target_job.text.find(i)
-    if (res != -1):
-        job_data['langs'].append(i)
+count = 0
+for j in jobs:
+    target_resp = requests.get(j['href'], proxies=config['proxies'], headers=config['headers'])
 
-for i in techs:
-    res = target_job.text.find(i)
-    if (res != -1):
-        job_data['techs'].append(i)
+    if(target_resp.status_code == 200):
+        target_soup = BeautifulSoup(target_resp.text, 'html.parser')
+        target_job = target_soup.find('div', class_ = 'show-more-less-html__markup')
 
-print(job_data)
+        job_data = {
+            'description': '',
+            'title': target_soup.find('h1', class_= 'top-card-layout__title').text.strip(),
+            'company': target_soup.find('a', class_='topcard__org-name-link').text.strip(),
+            'location': target_soup.find('span', class_='topcard__flavor topcard__flavor--bullet').text.strip(),
+            'pay': p.text.strip() if (p := target_soup.find('div', class_='salary compensation__salary')) else '',
+            'level': target_soup.find('span', class_= 'description__job-criteria-text description__job-criteria-text--criteria').text.strip(),
+            'langs': [],
+            'techs': [],
+        }
+
+        for i in languages:
+            res = target_job.text.lower().find(i.lower())
+            if (res != -1):
+                job_data['langs'].append(i)
+                langs_num[i] += 1
+
+        for i in techs:
+            res = target_job.text.lower().find(i.lower())
+            if (res != -1):
+                job_data['techs'].append(i)
+                techs_num[i] += 1
+
+        count+=1
+        print(f'{count}/{len(jobs)}')
+        job_datas.append(job_data)
+
+
+        lang_df = pd.DataFrame.from_dict(langs_num, orient="index")
+        techs_df = pd.DataFrame.from_dict(techs_num, orient="index")
+
+        job_datas_json = json.dumps(job_datas)
+
+        with open('job_datas.json', 'w') as file:
+            file.write(str(job_datas_json))
+            #json.dumps(job_datas_json, file, indent=4)
+
+        lang_df.to_csv('langs.csv')
+        techs_df.to_csv('techs.csv')
