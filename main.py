@@ -58,23 +58,21 @@ def get_job_data(j):
             'techs': [],
         }
 
-        target_desc = target_job.text.split()
+        target_desc = target_job.text.translate(str.maketrans('', '', ',/')).split()
 
         for i in target_desc:
             if i in languages and i not in job_data['langs']:
                 job_data['langs'].append(i)
-                print(job_data['langs'])
                 langs_num[i] += 1
 
             if i in techs and i not in job_data['techs']:
                 job_data['techs'].append(i)
-                print(job_data['techs'])
                 techs_num[i] += 1
 
         return job_data
 
-#TO-DO ignore dup jobs
-for x in range(5):
+#TO-DO ignore dup jobs, get date posted, save unique jobs in a database
+for x in range(1):
     jobs = get_jobs(x)
     count = 0
     for j in jobs:
