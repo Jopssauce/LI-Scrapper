@@ -30,14 +30,22 @@ langs_num = {}
 techs_num = {}
 job_datas = []
 
-languages = set(config["Languages"])
-techs = set(config["Techs"])
+lang_casefolded = []
+tech_casefolded = []
+
+for l in config["Languages"]:
+    lang_casefolded.append(l.casefold())
+for t in config["Techs"]:
+    tech_casefolded.append(t.casefold())
+
+languages = set(lang_casefolded)
+techs = set(tech_casefolded)
 
 for i in config['Languages']:
-    langs_num[i] = 0
+    langs_num[i.casefold()] = 0
 
 for i in config['Techs']:
-    techs_num[i] = 0
+    techs_num[i.casefold()] = 0
 
 def get_job_data(j):
     target_resp = requests.get(j['href'], proxies=config['proxies'], headers=config['headers'])
@@ -58,7 +66,7 @@ def get_job_data(j):
             'techs': [],
         }
 
-        target_desc = target_job.text.translate(str.maketrans('', '', ',/')).split()
+        target_desc = target_job.text.translate(str.maketrans(',/', '  ')).casefold().split()
 
         for i in target_desc:
             if i in languages and i not in job_data['langs']:
