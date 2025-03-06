@@ -3,6 +3,7 @@ import requests
 import random
 import json
 import pandas as pd
+from string import punctuation
 
 
 li_url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?_l=en_US&keywords=Software%20Engineer&location=San%20Francisco%20Bay%20Area&geoId=90000084&f_TPR=r86400&start={}"
@@ -47,6 +48,8 @@ for i in config['Languages']:
 for i in config['Techs']:
     techs_num[i.casefold()] = 0
 
+punc = punctuation.replace('#','').replace('+','').replace('.','')
+
 def get_job_data(j):
     target_resp = requests.get(j['href'], proxies=config['proxies'], headers=config['headers'])
 
@@ -66,7 +69,7 @@ def get_job_data(j):
             'techs': [],
         }
 
-        target_desc = target_job.text.translate(str.maketrans(',/', '  ')).casefold().split()
+        target_desc = target_job.text.translate(str.maketrans(punc, ' '*len(punc))).casefold().split()
 
         for i in target_desc:
             if i in languages and i not in job_data['langs']:
@@ -80,7 +83,7 @@ def get_job_data(j):
         return job_data
 
 #TO-DO ignore dup jobs, get date posted, save unique jobs in a database
-for x in range(1):
+for x in range(10):
     jobs = get_jobs(x)
     count = 0
     for j in jobs:
