@@ -6,7 +6,7 @@ import pandas as pd
 from string import punctuation
 
 
-li_url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?_l=en_US&keywords=Software%20Engineer&location=San%20Francisco%20Bay%20Area&geoId=90000084&f_TPR=r86400&start={}"
+li_url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?_l=en_US&keywords=Software%20Engineer&location=San%20Francisco%20Bay%20Area&f_TPR=r86400&start={}"
 test_url = "http://lumtest.com/myip.json"
 
 config = json.load(open("scrapper-config.json"))
@@ -56,7 +56,7 @@ def get_job_data(j):
     if(target_resp.status_code == 200):
         target_soup = BeautifulSoup(target_resp.text, 'html.parser')
         target_job = target_soup.find('div', class_ = 'show-more-less-html__markup')
-
+    #TO-DO add date and time of job posted
         job_data = {
             'description': str(target_job).strip(),
             'title': target_soup.find('h1', class_= 'top-card-layout__title').text.strip(),
@@ -71,6 +71,7 @@ def get_job_data(j):
 
         target_desc = target_job.text.translate(str.maketrans(punc, ' '*len(punc))).casefold().split()
 
+        #TO-DO solve cases likes Postgres and Postgresql, maybe regex?, or a dictionary {alternate name: real name}
         for i in target_desc:
             if i in languages and i not in job_data['langs']:
                 job_data['langs'].append(i)
@@ -82,7 +83,7 @@ def get_job_data(j):
 
         return job_data
 
-#TO-DO ignore dup jobs, get date posted, save unique jobs in a database
+#TO-DO ignore dup jobs save unique jobs in a database, get total number of jobs and scrape all of them
 for x in range(10):
     jobs = get_jobs(x)
     count = 0
@@ -92,6 +93,7 @@ for x in range(10):
         print(f'{count}/{len(jobs)}')
         job_datas.append(job_data)
 
+#TO-DO organize file names by date and time, seperate folder
 lang_df = pd.DataFrame.from_dict(langs_num, orient="index")
 techs_df = pd.DataFrame.from_dict(techs_num, orient="index")
 
