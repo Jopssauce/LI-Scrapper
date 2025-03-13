@@ -3,10 +3,12 @@ import requests
 import random
 import json
 import pandas as pd
+import urllib.parse
 from string import punctuation
 
-
-li_url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?_l=en_US&keywords=Software%20Engineer&location=San%20Francisco%20Bay%20Area&f_TPR=r86400&start={}"
+job_keyword = urllib.parse.quote_plus('Software Engineer')
+location_keyword = urllib.parse.quote_plus('San Francisco Bay Area')
+li_url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?_l=en_US&keywords={}&location={}&f_TPR=r86400&start={}"
 test_url = "http://lumtest.com/myip.json"
 
 config = json.load(open("scrapper-config.json"))
@@ -16,7 +18,9 @@ rand_proxy = random.choice(proxies_list)
 def get_jobs(pageNum):
     # Okay using only an HTTP proxy works but is NOT SAFE
     # https://stackoverflow.com/questions/69220126/getting-ssl-certificate-verify-failed-when-using-proxy-with-python-requests
-    resp = requests.get(li_url.format(pageNum * 25), proxies=config['proxies'], headers=config['headers'])
+    url_string = li_url.format(job_keyword, location_keyword, pageNum * 25)
+    print(url_string)
+    resp = requests.get(url_string, proxies=config['proxies'], headers=config['headers'])
 
     if(resp.status_code != 200):
         print(f"Failed with {resp.status_code}")
@@ -84,14 +88,17 @@ def get_job_data(j):
         return job_data
 
 #TO-DO ignore dup jobs save unique jobs in a database, get total number of jobs and scrape all of them
-for x in range(10):
+total_count = 0
+for x in range(20):
     jobs = get_jobs(x)
     count = 0
+    total_count += len(jobs)
     for j in jobs:
         job_data = get_job_data(j)            
         count+=1
-        print(f'{count}/{len(jobs)}')
+        #print(f'{count}/{len(jobs)}')
         job_datas.append(job_data)
+print(f"{total_count} Jobs scraped")
 
 #TO-DO organize file names by date and time, seperate folder
 lang_df = pd.DataFrame.from_dict(langs_num, orient="index")
