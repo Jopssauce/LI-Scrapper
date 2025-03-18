@@ -4,6 +4,8 @@ import random
 import json
 import pandas as pd
 import urllib.parse
+import datetime
+import os
 from string import punctuation
 
 job_keyword = urllib.parse.quote_plus('Software Engineer')
@@ -11,6 +13,7 @@ location_keyword = urllib.parse.quote_plus('San Francisco Bay Area')
 li_url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?_l=en_US&keywords={}&location={}&f_TPR=r86400&start={}"
 test_url = "http://lumtest.com/myip.json"
 
+#TO-DO remove keywords from config
 config = json.load(open("scrapper-config.json"))
 proxies_list = config['proxies_list']
 rand_proxy = random.choice(proxies_list)
@@ -89,7 +92,7 @@ def get_job_data(j):
 
 #TO-DO ignore dup jobs save unique jobs in a database, get total number of jobs and scrape all of them
 total_count = 0
-for x in range(20):
+for x in range(10):
     jobs = get_jobs(x)
     count = 0
     total_count += len(jobs)
@@ -100,14 +103,17 @@ for x in range(20):
         job_datas.append(job_data)
 print(f"{total_count} Jobs scraped")
 
-#TO-DO organize file names by date and time, seperate folder
-lang_df = pd.DataFrame.from_dict(langs_num, orient="index")
-techs_df = pd.DataFrame.from_dict(techs_num, orient="index")
+#TO-DO arrange data in a table left column is category, top row is the date
+lang_df = pd.DataFrame.from_dict(langs_num, orient='index', columns=['Date'])
+techs_df = pd.DataFrame.from_dict(techs_num, orient='index', columns=['Date'])
 
 job_datas_json = json.dumps(job_datas)
 
-with open('job_datas.json', 'w') as file:
+directory = f"data/{job_keyword}_{location_keyword}_{datetime.datetime.now().strftime('%x').replace('/', '-')}"
+os.makedirs(directory)
+
+with open(f'{directory}/job_datas.json', 'w') as file:
     file.write(str(job_datas_json))
 
-lang_df.to_csv('langs.csv')
-techs_df.to_csv('techs.csv')
+lang_df.to_csv(f'{directory}/langs.csv')
+techs_df.to_csv(f'{directory}/techs.csv')
