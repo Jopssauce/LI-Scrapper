@@ -19,8 +19,6 @@ proxies_list = config['proxies_list']
 rand_proxy = random.choice(proxies_list)
 
 def get_jobs(pageNum):
-    # Okay using only an HTTP proxy works but is NOT SAFE
-    # https://stackoverflow.com/questions/69220126/getting-ssl-certificate-verify-failed-when-using-proxy-with-python-requests
     url_string = li_url.format(job_keyword, location_keyword, pageNum * 25)
     print(url_string)
     resp = requests.get(url_string, proxies=config['proxies'], headers=config['headers'])
@@ -92,7 +90,7 @@ def get_job_data(j):
 
 #TO-DO ignore dup jobs save unique jobs in a database, get total number of jobs and scrape all of them
 total_count = 0
-for x in range(10):
+for x in range(39):
     jobs = get_jobs(x)
     count = 0
     total_count += len(jobs)
@@ -110,7 +108,8 @@ techs_df = pd.DataFrame.from_dict(techs_num, orient='index', columns=['Date'])
 job_datas_json = json.dumps(job_datas)
 
 directory = f"data/{job_keyword}_{location_keyword}_{datetime.datetime.now().strftime('%x').replace('/', '-')}"
-os.makedirs(directory)
+if os.path.isdir(directory) == False:
+    os.makedirs(directory)
 
 with open(f'{directory}/job_datas.json', 'w') as file:
     file.write(str(job_datas_json))
