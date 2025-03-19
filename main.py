@@ -11,8 +11,9 @@ from requests import Session
 from requests.adapters import HTTPAdapter
 
 
-job_keyword = urllib.parse.quote_plus('Software Engineer')
-location_keyword = urllib.parse.quote_plus('San Francisco Bay Area')
+job_keyword = urllib.parse.quote_plus(input('Job: '))
+location_keyword = urllib.parse.quote_plus(input('Location: '))
+pages = int(input('Pages to scrape: '))
 li_url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?_l=en_US&keywords={}&location={}&f_TPR=r86400&start={}"
 test_url = "http://lumtest.com/myip.json"
 
@@ -65,7 +66,7 @@ for i in config['Languages']:
 for i in config['Techs']:
     techs_num[i.casefold()] = 0
 
-punc = punctuation.replace('#','').replace('+','').replace('.','')
+punc = punctuation.replace('#','').replace('+','').replace('.','').replace('-','')
 
 def get_job_data(j):
     s = Session()
@@ -111,7 +112,8 @@ def get_job_data(j):
 
 #TO-DO ignore dup jobs save unique jobs in a database, get total number of jobs and scrape all of them
 total_count = 0
-for x in range(39):
+
+for x in range(pages):
     jobs = get_jobs(x)
     count = 0
     total_count += len(jobs)
@@ -128,7 +130,7 @@ techs_df = pd.DataFrame.from_dict(techs_num, orient='index', columns=['Date'])
 
 job_datas_json = json.dumps(job_datas)
 
-directory = f"_data/{job_keyword}_{location_keyword}_{datetime.datetime.now().strftime('%x').replace('/', '-')}_{datetime.datetime.now().strftime('%X').replace(':', '-')}"
+directory = f"_data/{urllib.parse.unquote_plus(job_keyword)}_{urllib.parse.unquote_plus(location_keyword)}_{datetime.datetime.now().strftime('%x').replace('/', '-')}_{datetime.datetime.now().strftime('%X').replace(':', '-')}"
 if os.path.isdir(directory) == False:
     os.makedirs(directory)
 
