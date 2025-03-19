@@ -128,7 +128,7 @@ techs_df = pd.DataFrame.from_dict(techs_num, orient='index', columns=['Date'])
 
 job_datas_json = json.dumps(job_datas)
 
-directory = f"data/{job_keyword}_{location_keyword}_{datetime.datetime.now().strftime('%x').replace('/', '-')}_{datetime.datetime.now().strftime('%X').replace(':', '-')}"
+directory = f"_data/{job_keyword}_{location_keyword}_{datetime.datetime.now().strftime('%x').replace('/', '-')}_{datetime.datetime.now().strftime('%X').replace(':', '-')}"
 if os.path.isdir(directory) == False:
     os.makedirs(directory)
 
