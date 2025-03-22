@@ -20,6 +20,7 @@ test_url = "http://lumtest.com/myip.json"
 #TO-DO remove keywords from config
 config = json.load(open("scrapper-config.json"))
 proxies_list = config['proxies_list']
+past_time = datetime.datetime.now()
 
 def get_jobs(pageNum):
     s = Session()
@@ -38,7 +39,6 @@ def get_jobs(pageNum):
     if(resp.status_code != 200):
         print(f"Failed with {resp.status_code}")
     else:
-        print(f"Success - {resp.status_code}")
         soup = BeautifulSoup(resp.text, 'html.parser')
 
     s.close()    
@@ -83,7 +83,7 @@ def get_job_data(j):
     if(target_resp.status_code == 200):
         target_soup = BeautifulSoup(target_resp.text, 'html.parser')
         target_job = target_soup.find('div', class_ = 'show-more-less-html__markup')
-    #TO-DO add date and time of job posted
+    #TO-DO add date and time of job posted, black list certain companies like Dice, Jobs via Dice
         job_data = {
             #'description': str(target_job).strip(),
             'title': target_soup.find('h1', class_= 'top-card-layout__title').text.strip(),
@@ -117,6 +117,7 @@ for x in range(pages):
     jobs = get_jobs(x)
     count = 0
     total_count += len(jobs)
+    print(f'Page {x+1} has {len(jobs)} Jobs')
     for j in jobs:
         job_data = get_job_data(j)            
         count+=1
@@ -139,3 +140,6 @@ with open(f'{directory}/job_datas.json', 'w') as file:
 
 lang_df.to_csv(f'{directory}/langs.csv')
 techs_df.to_csv(f'{directory}/techs.csv')
+
+cur_time = datetime.datetime.now() - past_time
+print(cur_time)
