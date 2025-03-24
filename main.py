@@ -13,8 +13,14 @@ from requests.adapters import HTTPAdapter
 
 job_keyword = urllib.parse.quote_plus(input('Job: '))
 location_keyword = urllib.parse.quote_plus(input('Location: '))
-pages = int(input('Pages to scrape: '))
-li_url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?_l=en_US&keywords={}&location={}&f_TPR=r86400&start={}"
+level = int(input('Seniority Level: ') or 0)  # 0 - Any 1 - Intern 2 - Entry 3 - Associate 4 - Mid-Senior
+tpr = int(input('Time Period: ') or 86400) 
+pages = int(input('Pages to scrape: ') or 40) 
+# f_TPR=r604800 = this week
+# f_TPR=r86400 = 24 hrs ago
+# f_TPR=r259200 = 3 days ago
+# f_TPR=seconds
+li_url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?_l=en_US&keywords={}&location={}&f_E={}&f_TPR={}&start={}"
 test_url = "http://lumtest.com/myip.json"
 
 #TO-DO remove keywords from config
@@ -32,7 +38,7 @@ def get_jobs(pageNum):
     )
     s.mount('https://', HTTPAdapter(max_retries=retries))
 
-    url_string = li_url.format(job_keyword, location_keyword, pageNum * 25)
+    url_string = li_url.format(job_keyword, location_keyword, level, tpr, pageNum * 25)
     print(url_string)
     resp = s.get(url_string, proxies=config['proxies'], headers=config['headers'])
 
@@ -89,6 +95,9 @@ def get_job_data(j):
             'title': target_soup.find('h1', class_= 'top-card-layout__title').text.strip(),
             'company': target_soup.find('a', class_='topcard__org-name-link').text.strip(),
             'location': target_soup.find('span', class_='topcard__flavor topcard__flavor--bullet').text.strip(),
+            # Removed applications because the guest and actual version are not the same. This just causes confusion.
+            #'applicants': p.text.strip() if (p := target_soup.find('span', class_='num-applicants__caption')) else '',
+            'date': target_soup.find('span', class_='posted-time-ago__text').text.strip(),
             'pay': p.text.strip() if (p := target_soup.find('div', class_='salary compensation__salary')) else '',
             'level': target_soup.find('span', class_= 'description__job-criteria-text description__job-criteria-text--criteria').text.strip(),
             'link': j['href'],
