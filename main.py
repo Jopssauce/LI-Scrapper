@@ -14,7 +14,7 @@ from requests.adapters import HTTPAdapter
 job_keyword = urllib.parse.quote_plus(input('Job: '))
 location_keyword = urllib.parse.quote_plus(input('Location: '))
 level = int(input('Seniority Level: ') or 0)  # 0 - Any 1 - Intern 2 - Entry 3 - Associate 4 - Mid-Senior
-tpr = int(input('Time Period: ') or 86400) 
+tpr = input('Time Period: ') or '86400' 
 pages = int(input('Pages to scrape: ') or 40) 
 # f_TPR=r604800 = this week
 # f_TPR=r86400 = 24 hrs ago
@@ -38,7 +38,7 @@ def get_jobs(pageNum):
     )
     s.mount('https://', HTTPAdapter(max_retries=retries))
 
-    url_string = li_url.format(job_keyword, location_keyword, level, tpr, pageNum * 25)
+    url_string = li_url.format(job_keyword, location_keyword, level, 'r' + tpr, pageNum * 25)
     print(url_string)
     resp = s.get(url_string, proxies=config['proxies'], headers=config['headers'])
 
