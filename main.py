@@ -47,6 +47,10 @@ def get_jobs(pageNum):
     else:
         soup = BeautifulSoup(resp.text, 'html.parser')
 
+    if not soup:
+        print(f"Failed to Parse {resp.status_code}")
+        return []
+
     s.close()    
     return soup.find_all("a", class_ = 'base-card__full-link', href=True)
 
