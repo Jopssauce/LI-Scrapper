@@ -170,5 +170,4 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-scrapper-config.json
 _data

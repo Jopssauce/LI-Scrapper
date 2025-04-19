@@ -1,0 +1,16 @@
+{
+    "headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.5"
+    },
+
+    "Languages": ["C++", "C#", "Python", "JavaScript", "Java", "PHP", "Ruby", "Swift", "SQL", "Kotlin", "TypeScript", "Go", "Rust", "Scala", "Dart", "Perl", "VBA", "Elixir", "GraphQL", "Bash"],
+    "Techs": ["Lamp", "MEAN", "MERN", "MySQL", "ASP.NET", ".NET", "WPF", "Linux", "iOS", "Android", "Mobile", "Flutter", "React", 
+    "Angular", "Apache", "MongoDB", "Node.js", "Node", "Postgres", "PostgreSQL", "NoSQL","Azure", "AWS", "GCP","SpringBoot", "Spring Boot", 
+    "Spring Framework", "CI/CD", "CI CD","Selenium", "REST", "Unity", "Game", "AR/VR", "3D", "QA", "Kubernetes", "Docker", "Terraform", "DynamoDB", "LLM",
+    "EC2", "S3", "Lambda", "VPC", "IAM", "Snowflake", "Redshift", "BigQuery", "GitHub Actions", "CircleCI", "AWS Certified DevOps Engineer", 
+    "Jenkins", "GitLab CI/CD", "AWS CodePipeline", "CloudFormation", "Prometheus", "Grafana", "Loki", "Datadog", "CloudWatch", "Django", "Flask", "Electron", "A+", "Network+", "Security+", "CompTIA", "CISSP", "CISA", "CCNP", "CCNA", "AZ-700", "CySA+",
+    "VMWare", "Proxmox", "Clearance", "SIEM", "Splunk", "L1", "L2", "CEH", "GWAPT", "GPEN", "OSCP", "OSWA"],
+
+    "Blacklist": ["Jobs via Dice"]
+}
