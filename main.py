@@ -25,7 +25,7 @@ test_url = "http://lumtest.com/myip.json"
 
 #TO-DO remove keywords from config
 config = json.load(open("scrapper-config.json"))
-proxies_list = config['proxies_list']
+proxies_list = json.load(open("proxies-config.json"))
 past_time = datetime.datetime.now()
 
 def get_jobs(pageNum):
@@ -40,7 +40,7 @@ def get_jobs(pageNum):
 
     url_string = li_url.format(job_keyword, location_keyword, level, 'r' + tpr, pageNum * 25)
     print(url_string)
-    resp = s.get(url_string, proxies=config['proxies'], headers=config['headers'])
+    resp = s.get(url_string, proxies=proxies_list['proxies'], headers=config['headers'])
 
     if(resp.status_code != 200):
         print(f"Failed with {resp.status_code}")
@@ -88,7 +88,7 @@ def get_job_data(j):
     )
     s.mount('https://', HTTPAdapter(max_retries=retries))
 
-    target_resp = s.get(j['href'], proxies=config['proxies'], headers=config['headers'])
+    target_resp = s.get(j['href'], proxies=proxies_list['proxies'], headers=config['headers'])
 
     if(target_resp.status_code == 200):
         target_soup = BeautifulSoup(target_resp.text, 'html.parser')

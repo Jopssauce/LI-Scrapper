@@ -169,5 +169,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+.DS_Store
 
+proxies-config.json
 _data
