@@ -41,18 +41,18 @@ def get_jobs(pageNum):
     url_string = li_url.format(job_keyword, location_keyword, level, 'r' + tpr, pageNum * 25)
     print(url_string)
     resp = s.get(url_string, proxies=proxies_list['proxies'], headers=config['headers'])
-
+    soup = None
     if(resp.status_code != 200):
         print(f"Failed with {resp.status_code}")
     else:
         soup = BeautifulSoup(resp.text, 'html.parser')
 
-    if not soup:
+    if soup is None:
         print(f"Failed to Parse {resp.status_code}")
         return []
 
     s.close()    
-    return soup.find_all("a", class_ = 'base-card__full-link', href=True)
+    return soup.find_all("div", class_ = 'base-card')
 
 #Init dictionaries
 langs_num = {}
@@ -88,7 +88,9 @@ def get_job_data(j):
     )
     s.mount('https://', HTTPAdapter(max_retries=retries))
 
-    target_resp = s.get(j['href'], proxies=proxies_list['proxies'], headers=config['headers'])
+    # Find the link to job page
+    ref = j.find('a', class_ = 'base-card__full-link', href=True) 
+    target_resp = s.get(ref['href'], proxies=proxies_list['proxies'], headers=config['headers'])
 
     if(target_resp.status_code == 200):
         target_soup = BeautifulSoup(target_resp.text, 'html.parser')
@@ -104,7 +106,8 @@ def get_job_data(j):
             'date': target_soup.find('span', class_='posted-time-ago__text').text.strip(),
             'pay': p.text.strip() if (p := target_soup.find('div', class_='salary compensation__salary')) else '',
             'level': target_soup.find('span', class_= 'description__job-criteria-text description__job-criteria-text--criteria').text.strip(),
-            'link': j['href'],
+            'benefits': p.text.strip() if (p := j.find('span', class_ = 'job-posting-benefits__text')) else '' ,
+            'link': ref['href'],
             'langs': [],
             'techs': [],
         }
